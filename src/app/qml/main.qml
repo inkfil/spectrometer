@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Controls
-import QtCharts
 import Spectrometer
 
 ApplicationWindow {
@@ -58,8 +57,11 @@ ApplicationWindow {
         target: controller
 
         function onSpectrumUpdated(wl, intensity) {
-            console.log("QML received:", wl.length)
             spectrumView.setSpectrum(wl, intensity)
+        }
+
+        function onErrorChanged(message) {
+            console.warn(message)
         }
     }
 }

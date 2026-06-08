@@ -1,38 +1,45 @@
 #include "spectrometercontroller.hpp"
-#include "../acquisition/mockspectrometer/mockspectrometer.hpp"
-#include "../processing/movingaverage.hpp"
+#include "../core/appconfig.hpp"
+#include "../core/logging.hpp"
 
-SpectrometerController::SpectrometerController(QObject* parent): QObject(parent){
+SpectrometerController::SpectrometerController(QObject* parent): QObject(parent) {
+    qCInfo(appLog) << "Creating spectrometer controller";
 
-    qDebug() << "[SpectrometerController::SpectrometerController] this: " << this;
+    worker = new AcquisitionWorker(AppConfig::defaults());
+    worker->moveToThread(&acquisitionThread);
 
-    device = std::make_unique<MockSpectrometer>();
-    device->connect();
+    connect(&acquisitionThread, &QThread::finished, worker, &QObject::deleteLater);
+    connect(this, &SpectrometerController::startRequested, worker, &AcquisitionWorker::start);
+    connect(this, &SpectrometerController::stopRequested, worker, &AcquisitionWorker::stop);
 
-    pipeline.add(std::make_unique<MovingAverage>());
+    connect(worker, &AcquisitionWorker::spectrumReady,
+            this, &SpectrometerController::spectrumUpdated,
+            Qt::QueuedConnection);
 
-    connect(&timer, &QTimer::timeout, this, [this]() {
-        auto raw = device->acquire();
-        auto processed = pipeline.run(raw);
+    connect(worker, &AcquisitionWorker::acquisitionError,
+            this, [this](const QString& message) {
+                qCWarning(acquisitionLog) << message;
+                emit errorChanged(message);
+            },
+            Qt::QueuedConnection);
 
-        QVector<double> wl, in;
-        for (size_t i = 0; i < processed.wavelengths.size(); ++i) {
-            wl.append(processed.wavelengths[i]);
-            in.append(processed.intensities[i]);
-        }
-
-        emit spectrumUpdated(wl, in);
-    });
+    acquisitionThread.start();
 }
 
-SpectrometerController::~SpectrometerController(){
-    qDebug() << "[SpectrometerController::SpectrometerController] this: " << this;
+SpectrometerController::~SpectrometerController() {
+    if (acquisitionThread.isRunning() && worker) {
+        QMetaObject::invokeMethod(worker, "stop", Qt::BlockingQueuedConnection);
+    }
+
+    acquisitionThread.quit();
+    acquisitionThread.wait();
+    qCInfo(appLog) << "Destroyed spectrometer controller";
 }
 
 void SpectrometerController::start() {
-    timer.start(50); // ~20 FPS
+    emit startRequested();
 }
 
 void SpectrometerController::stop() {
-    timer.stop();
+    emit stopRequested();
 }

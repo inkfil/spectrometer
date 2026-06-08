@@ -1,4 +1,7 @@
-#include <spectrum.hpp>
+#pragma once
+
+#include "../core/spectrum.hpp"
+#include <string>
 
 // Storage interface
 class IStorage {

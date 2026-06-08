@@ -1,18 +1,19 @@
 #pragma once
 #include "../spectrometer.hpp"
 #include <random>
-#include <QDebug>
 
 class MockSpectrometer : public ISpectrometer {
 public:
-    MockSpectrometer();
+    explicit MockSpectrometer(AcquisitionSettings settings = {});
     ~MockSpectrometer();
 
-    void connect() override;
+    bool connect() override;
     void disconnect() override;
-    Spectrum acquire() override;
+    bool isConnected() const override;
+    AcquisitionResult acquire() override;
 
 private:
+    AcquisitionSettings settings;
     bool m_connected = false;
     std::mt19937 rng{std::random_device{}()};
 };

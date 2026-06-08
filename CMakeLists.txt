@@ -7,10 +7,13 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick Charts)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick)
 find_package(Eigen3 REQUIRED)
 
 add_executable(app
+    src/core/appconfig.hpp
+    src/core/logging.hpp
+    src/core/logging.cpp
     src/core/spectrum.hpp
 
     src/processing/signalprocessor.hpp
@@ -24,6 +27,8 @@ add_executable(app
     src/acquisition/mockspectrometer/mockspectrometer.hpp
     src/acquisition/mockspectrometer/mockspectrometer.cpp
 
+    src/app/acquisitionworker.hpp
+    src/app/acquisitionworker.cpp
     src/app/spectrometercontroller.hpp
     src/app/spectrometercontroller.cpp
     src/main.cpp
@@ -37,6 +42,5 @@ target_link_libraries(app PRIVATE
     Qt6::Gui
     Qt6::Qml
     Qt6::Quick
-    Qt6::Charts
     Eigen3::Eigen
 )

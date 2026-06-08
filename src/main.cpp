@@ -1,4 +1,4 @@
-#include <QApplication>
+#include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QSurfaceFormat>
@@ -6,10 +6,12 @@
 
 using namespace Qt::StringLiterals;
 
+#include "core/logging.hpp"
 #include "app/spectrometercontroller.hpp"
 #include "app/spectrumview.hpp"
 
 int main(int argc, char *argv[]) {
+    installSpectrometerMessageHandler();
 
     QSurfaceFormat format;
     format.setRenderableType(QSurfaceFormat::OpenGL);
@@ -18,7 +20,7 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
     QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
 
-    QApplication app(argc, argv);
+    QGuiApplication app(argc, argv);
 
     qmlRegisterType<SpectrumView>("Spectrometer", 1, 0, "SpectrumView");
 
@@ -27,7 +29,6 @@ int main(int argc, char *argv[]) {
 
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated, &app,
         [url](QObject *obj, const QUrl &objUrl) {
-            qDebug() << "Obj: " << obj << ", ObjUrl: " << objUrl;
             if (!obj && url == objUrl){
                 QCoreApplication::exit(-1);
             }
@@ -41,7 +42,6 @@ int main(int argc, char *argv[]) {
     engine.rootContext()->setContextProperty("controller", &controller);
 
     engine.load(url);
-    qDebug() << "engine_object sizes: " << engine.rootObjects().size() << ", enfine.rootobj at 0: " << engine.rootObjects().at(0);
 
     if (engine.rootObjects().isEmpty()) {
         return -1;

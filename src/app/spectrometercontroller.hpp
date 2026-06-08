@@ -1,11 +1,9 @@
 #pragma once
 #include <QObject>
 #include <QVector>
-#include <QTimer>
-#include <QDebug>
+#include <QThread>
 
-#include "../acquisition/spectrometer.hpp"
-#include "../processing/processingpipeline.hpp"
+#include "acquisitionworker.hpp"
 
 class SpectrometerController : public QObject {
     Q_OBJECT
@@ -20,9 +18,11 @@ public:
 signals:
     void spectrumUpdated(QVector<double> wavelengths,
                          QVector<double> intensities);
+    void errorChanged(QString message);
+    void startRequested();
+    void stopRequested();
 
 private:
-    std::unique_ptr<ISpectrometer> device;
-    ProcessingPipeline pipeline;
-    QTimer timer;
+    QThread acquisitionThread;
+    AcquisitionWorker* worker = nullptr;
 };

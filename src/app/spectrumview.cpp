@@ -37,8 +37,6 @@ void SpectrumView::setSpectrum(QVariantList wlList,
 QSGNode* SpectrumView::updatePaintNode(QSGNode* oldNode,
                                        UpdatePaintNodeData*)
 {
-    qDebug() << "updatePaintNode called";
-
     // -------------------------------
     // 1. Thread-safe copy
     // -------------------------------
@@ -50,13 +48,11 @@ QSGNode* SpectrumView::updatePaintNode(QSGNode* oldNode,
     }
 
     int N = wl.size();
-    qDebug() << "points:" << N;
 
     // -------------------------------
     // 2. Early exit
     // -------------------------------
     if (N < 2) {
-        qDebug() << "Not enough data";
         return oldNode;
     }
 
@@ -90,8 +86,6 @@ QSGNode* SpectrumView::updatePaintNode(QSGNode* oldNode,
     // -------------------------------
     int vertexCount = (N - 1) * 6;  // 2 triangles per segment
     geometry->allocate(vertexCount);
-
-    qDebug() << "Allocating vertices:" << vertexCount;
 
     auto* vertices = geometry->vertexDataAsColoredPoint2D();
 

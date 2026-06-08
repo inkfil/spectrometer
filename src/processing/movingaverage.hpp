@@ -1,6 +1,5 @@
 #pragma once
 #include "signalprocessor.hpp"
-#include <QDebug>
 
 class MovingAverage : public ISignalProcessor {
 public:
