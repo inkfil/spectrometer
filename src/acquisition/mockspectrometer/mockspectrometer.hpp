@@ -1,10 +1,11 @@
 #pragma once
 #include "../spectrometer.hpp"
-#include <random>
+#include "../../synthetic/syntheticprofile.hpp"
 
 class MockSpectrometer : public ISpectrometer {
 public:
-    explicit MockSpectrometer(AcquisitionSettings settings = {});
+    explicit MockSpectrometer(AcquisitionSettings settings = {},
+                              SyntheticSpectrumConfig syntheticConfig = {});
     ~MockSpectrometer();
 
     bool connect() override;
@@ -14,6 +15,7 @@ public:
 
 private:
     AcquisitionSettings settings;
+    SyntheticSpectrumConfig syntheticConfig;
+    quint64 sequenceIndex = 0;
     bool m_connected = false;
-    std::mt19937 rng{std::random_device{}()};
 };

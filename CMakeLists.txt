@@ -16,6 +16,11 @@ add_executable(app
     src/core/logging.cpp
     src/core/spectrum.hpp
 
+    src/synthetic/syntheticprofile.hpp
+    src/synthetic/syntheticprofile.cpp
+    src/synthetic/syntheticgenerator.hpp
+    src/synthetic/syntheticgenerator.cpp
+
     src/processing/signalprocessor.hpp
     src/processing/processingpipeline.hpp
 
@@ -24,6 +29,8 @@ add_executable(app
 
     src/acquisition/spectrometer.hpp
 
+    src/acquisition/filespectrometer/filespectrometer.hpp
+    src/acquisition/filespectrometer/filespectrometer.cpp
     src/acquisition/mockspectrometer/mockspectrometer.hpp
     src/acquisition/mockspectrometer/mockspectrometer.cpp
 

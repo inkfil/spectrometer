@@ -1,13 +1,19 @@
 #include "acquisitionworker.hpp"
 
+#include "../acquisition/filespectrometer/filespectrometer.hpp"
 #include "../acquisition/mockspectrometer/mockspectrometer.hpp"
 #include "../core/logging.hpp"
 #include "../processing/movingaverage.hpp"
 
 AcquisitionWorker::AcquisitionWorker(AppConfig config, QObject* parent)
     : QObject(parent),
-      config(config),
-      device(std::make_unique<MockSpectrometer>(config.acquisition)) {
+      config(config) {
+    if (config.acquisitionSource == AcquisitionSource::FileReplay) {
+        device = std::make_unique<FileSpectrometer>(config.replayFilePath, config.acquisition);
+    } else {
+        device = std::make_unique<MockSpectrometer>(config.acquisition, config.synthetic);
+    }
+
     configurePipeline();
 }
 
